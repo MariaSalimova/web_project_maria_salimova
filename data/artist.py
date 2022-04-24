@@ -10,10 +10,9 @@ class Artist(SqlAlchemyBase, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     artist_name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    email = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=True)
+    email = sqlalchemy.Column(sqlalchemy.String, index=True, unique=True, nullable=False)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-
-    pictures = orm.relation("pictures", back_populates='artist')
+    about = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
     def __repr__(self):
         return f'<Artist> {self.id} {self.name} {self.email}'
