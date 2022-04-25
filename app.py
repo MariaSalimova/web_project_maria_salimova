@@ -1,9 +1,14 @@
 from flask import Flask, render_template, redirect
 from data.db_session import global_init, create_session
 from data.artist import Artist
+from data.picture import Picture
 from forms.registration_form import RegisterForm
+from forms.login_form import LoginForm
+from secret_key import SECRET_KEY
+
+
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'искусство_должно_быть_свободным'
+app.config['SECRET_KEY'] = SECRET_KEY
 global_init('gallery.db')
 
 
@@ -13,13 +18,18 @@ def main_page():
 
 
 @app.route('/<artist_id>')
-def pictures_catalog(artist_id):
+def artists_pictures(artist_id):
+    db_sess = create_session()
+    pictures = db_sess.query(Picture).filter(Picture.artist_id == artist_id).all()
     pass
 
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    pass
+    form = LoginForm()
+    if form.validate_on_submit():
+        return redirect('/')
+    return render_template('login.html', title='Авторизация', form=form)
 
 
 @app.route('/registration', methods=['GET', 'POST'])
