@@ -15,7 +15,7 @@ class Artist(SqlAlchemyBase, SerializerMixin):
     about = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
     def __repr__(self):
-        return f'<Artist> {self.id} {self.name} {self.email}'
+        return f'<Artist> {self.id} {self.artist_name} {self.email}'
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
