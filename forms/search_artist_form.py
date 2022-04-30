@@ -5,4 +5,4 @@ from wtforms.validators import DataRequired
 
 class SearchArtistForm(FlaskForm):
     username = StringField('Имя художника', validators=[DataRequired()])
-    submit = SubmitField('Искать')
+    submit = SubmitField('Поиск')
