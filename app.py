@@ -5,6 +5,7 @@ from data.picture import Picture
 from forms.registration_form import RegisterForm
 from forms.login_form import LoginForm
 from forms.search_artist_form import SearchArtistForm
+from forms.search_picture_form import SearchPictureForm
 from secret_key import SECRET_KEY
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
@@ -60,7 +61,7 @@ def registration():
         db_sess.add(user)
         db_sess.commit()
         return redirect('/login')
-    return render_template('register.html', title='Регистрация', form=form)
+    return render_template('generic_form.html', title='Регистрация', form=form)
 
 
 @app.route('/add_picture')
@@ -76,10 +77,15 @@ def view_picture(picture_id):
     pass
 
 
-@app.route('/search_picture')
-def search_picture(picture_name):
-    # TODO: здесь будет реализована фича поиска картины по названию
-    pass
+@app.route('/search_picture', methods=['GET', 'POST'])
+def search_picture():
+    form = SearchPictureForm()
+    if form.validate_on_submit():
+        db_sess = create_session()
+        picture = db_sess.query(Picture).filter(Picture.artist == form.artist_name.data,
+                                                Picture.title == form.title.data).first()
+        return redirect(f'/view_picture/{picture.id}')
+    return render_template('generic_form.html', title='Искать картину', form=form)
 
 
 @app.route('/search_artist', methods=['GET', 'POST'])
@@ -90,8 +96,7 @@ def search_artist():
         artist = db_sess.query(Artist).filter(Artist.artist_name == form.username.data).first()
         print(artist)
         return redirect(f'/artists/{artist.id}')
-    return render_template('search_artist.html', title='Искать художника', form=form)
-    pass
+    return render_template('generic_form.html', title='Искать художника', form=form)
 
 
 @app.route('/logout')
@@ -99,6 +104,24 @@ def search_artist():
 def logout():
     logout_user()
     return redirect("/")
+
+
+@app.route('/rate_picture')
+def rate_picture():
+    # TODO: здесь будет реализована фича оценки картины
+    pass
+
+
+@app.route('/delete_picture')
+def delete_picture():
+    # TODO: здесь будет реализована фича удаления картины
+    pass
+
+
+@app.route('/delete_artist')
+def delete_artist():
+    # TODO: здесь будет реализована фича удаления художника
+    pass
 
 
 @login_manager.user_loader
