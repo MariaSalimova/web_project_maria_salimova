@@ -22,8 +22,9 @@ def main_page():
 def artists_pictures(artist_id):
     # TODO: здесь будет реализована фича просмотра каталога картин
     db_sess = create_session()
+    artist = db_sess.query(Artist).filter(Artist.id == artist_id).first()
     pictures = db_sess.query(Picture).filter(Picture.artist_id == artist_id).all()
-    pass
+    return render_template('artists_pictures.html', artist=artist, pictures=pictures)
 
 
 @app.route('/login', methods=['GET', 'POST'])
