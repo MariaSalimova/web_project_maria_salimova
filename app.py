@@ -1,12 +1,8 @@
 from flask import Flask, render_template, redirect
-from data.db_session import global_init, create_session
-from data.artist import Artist
-from data.picture import Picture
-from forms.registration_form import RegisterForm
-from forms.login_form import LoginForm
-from forms.search_artist_form import SearchArtistForm
-from forms.search_picture_form import SearchPictureForm
+from data import *
+from forms import *
 from secret_key import SECRET_KEY
+from admin_password import ADMIN_PASSWORD
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 
 
@@ -35,8 +31,15 @@ def artists_pictures(artist_id):
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        return redirect('/')
-    return render_template('login.html', title='Авторизация', form=form)
+        db_sess = db_session.create_session()
+        user = db_sess.query(Artist).filter(Artist.artist_name == form.username.data).first()
+        if user and user.check_password(form.password.data):
+            login_user(user, remember=form.remember_me.data)
+            return redirect("/")
+        return render_template('generic_form.html',
+                               message="Неправильный логин или пароль",
+                               form=form)
+    return render_template('generic_form.html', title='Авторизация', form=form)
 
 
 @app.route('/registration', methods=['GET', 'POST'])
@@ -44,12 +47,12 @@ def registration():
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
-            return render_template('register.html', title='Регистрация',
+            return render_template('generic_form.html', title='Регистрация',
                                    form=form,
                                    message="Пароли не совпадают")
         db_sess = create_session()
         if db_sess.query(Artist).filter(Artist.email == form.email.data).first():
-            return render_template('register.html', title='Регистрация',
+            return render_template('generic_form.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
         user = Artist(
@@ -126,7 +129,8 @@ def delete_artist():
 
 @login_manager.user_loader
 def load_user(id):
-    return Artist.get(id)
+    db_sess = db_session.create_session()
+    return db_sess.query(Artist).get(id)
 
 
 if __name__ == '__main__':

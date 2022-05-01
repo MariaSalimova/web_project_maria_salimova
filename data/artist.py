@@ -2,10 +2,11 @@ import sqlalchemy
 from sqlalchemy import orm
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy_serializer import SerializerMixin
+from flask_login import UserMixin
 from data.db_session import SqlAlchemyBase
 
 
-class Artist(SqlAlchemyBase, SerializerMixin):
+class Artist(SqlAlchemyBase, UserMixin, SerializerMixin):
     __tablename__ = 'artists'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
