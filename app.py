@@ -20,7 +20,6 @@ def main_page():
 
 @app.route('/artists/<artist_id>')
 def artists_pictures(artist_id):
-    # TODO: здесь будет реализована фича просмотра каталога картин
     db_sess = create_session()
     artist = db_sess.query(Artist).filter(Artist.id == artist_id).first()
     pictures = db_sess.query(Picture).filter(Picture.artist_id == artist_id).all()
@@ -36,10 +35,10 @@ def login():
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
-        return render_template('generic_form.html',
+        return render_template('login.html',
                                message="Неправильный логин или пароль",
                                form=form)
-    return render_template('generic_form.html', title='Авторизация', form=form)
+    return render_template('login.html', title='Авторизация', form=form)
 
 
 @app.route('/registration', methods=['GET', 'POST'])
@@ -88,7 +87,7 @@ def search_picture():
         picture = db_sess.query(Picture).filter(Picture.artist == form.artist_name.data,
                                                 Picture.title == form.title.data).first()
         return redirect(f'/view_picture/{picture.id}')
-    return render_template('generic_form.html', title='Искать картину', form=form)
+    return render_template('search_picture.html', title='Искать картину', form=form)
 
 
 @app.route('/search_artist', methods=['GET', 'POST'])
@@ -99,7 +98,7 @@ def search_artist():
         artist = db_sess.query(Artist).filter(Artist.artist_name == form.username.data).first()
         print(artist)
         return redirect(f'/artists/{artist.id}')
-    return render_template('generic_form.html', title='Искать художника', form=form)
+    return render_template('search_artist.html', title='Искать художника', form=form)
 
 
 @app.route('/logout')
@@ -126,7 +125,7 @@ def delete_picture():
             db_sess.delete(picture)
             db_sess.commit()
         return redirect('/')
-    return render_template('generic_form.html', title='Удалить картину', form=form)
+    return render_template('delete_picture.html', title='Удалить картину', form=form)
 
 
 @app.route('/delete_artist', methods=['GET', 'POST'])
@@ -140,7 +139,7 @@ def delete_artist():
             db_sess.delete(artist)
             db_sess.commit()
         return redirect('/')
-    return render_template('generic_form.html', title='Удалить художника', form=form)
+    return render_template('delete_artist.html', title='Удалить художника', form=form)
 
 
 @login_manager.user_loader
