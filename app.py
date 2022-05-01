@@ -115,16 +115,32 @@ def rate_picture():
     pass
 
 
-@app.route('/delete_picture')
+@app.route('/delete_picture', methods=['GET', 'POST'])
 def delete_picture():
-    # TODO: здесь будет реализована фича удаления картины
-    pass
+    form = DeletePictureForm()
+    if form.validate_on_submit():
+        if form.admin_password.data == ADMIN_PASSWORD:
+            db_sess = create_session()
+            picture = db_sess.query(Picture).filter(Picture.artist == form.artist_name.data,
+                                                    Picture.title == form.title.data).first()
+            db_sess.delete(picture)
+            db_sess.commit()
+        return redirect('/')
+    return render_template('generic_form.html', title='Удалить картину', form=form)
 
 
-@app.route('/delete_artist')
+@app.route('/delete_artist', methods=['GET', 'POST'])
 def delete_artist():
-    # TODO: здесь будет реализована фича удаления художника
-    pass
+    form = DeleteArtistForm()
+    if form.validate_on_submit():
+        if form.admin_password.data == ADMIN_PASSWORD:
+            db_sess = create_session()
+            artist = db_sess.query(Artist).filter(Artist.artist_name == form.username.data).first()
+            db_sess.query(Picture).filter(Picture.artist_id == artist.id).delete()
+            db_sess.delete(artist)
+            db_sess.commit()
+        return redirect('/')
+    return render_template('generic_form.html', title='Удалить художника', form=form)
 
 
 @login_manager.user_loader
