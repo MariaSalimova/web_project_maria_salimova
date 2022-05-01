@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+          crossorigin="anonymous">
+    <title>{{title}}</title>
+</head>
+<p>
+    <a class="btn btn-primary " href="/search_artist">Искать художника</a>
+</p>
+<p>
+    <a class="btn btn-primary " href="/search_picture">Искать картину</a>
+</p>
+<p>
+    <a class="btn btn-primary " href="/rate_picture">Оценить картину</a>
+</p>
+<p>
+    <a class="btn btn-primary " href="/add_picture">Опубликовать картину</a>
+</p>
+<p>
+    <a class="btn btn-primary " href="/logout">Выйти из аккаунта</a>
+</p>
+<p>
+    <a class="btn btn-primary " href="/delete_picture">Удалить картину</a>
+</p>
+<p>
+    <a class="btn btn-primary " href="/delete_artist">Удалить художника</a>
+</p>
+{% endblock %}

@@ -15,8 +15,7 @@ global_init('gallery.db')
 
 @app.route('/')
 def main_page():
-    # TODO: здесь будет реализована фича навигации по сайту
-    return "искусство должно быть свободным"
+    return render_template('navigation_page.html', title='Главная страница')
 
 
 @app.route('/artists/<artist_id>')
