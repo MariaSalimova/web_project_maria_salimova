@@ -13,6 +13,16 @@ login_manager.init_app(app)
 global_init('gallery.db')
 
 
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('404.html')
+
+
+@app.errorhandler(500)
+def not_found(error):
+    return render_template('500.html')
+
+
 @app.route('/')
 def main_page():
     return render_template('navigation_page.html', title='Главная страница')
@@ -96,8 +106,11 @@ def search_artist():
     if form.validate_on_submit():
         db_sess = create_session()
         artist = db_sess.query(Artist).filter(Artist.artist_name == form.username.data).first()
-        print(artist)
-        return redirect(f'/artists/{artist.id}')
+        if artist:
+            print(artist)
+            return redirect(f'/artists/{artist.id}')
+        else:
+            return render_template('404.html')
     return render_template('search_artist.html', title='Искать художника', form=form)
 
 
