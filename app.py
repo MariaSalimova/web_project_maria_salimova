@@ -96,7 +96,10 @@ def search_picture():
         db_sess = create_session()
         picture = db_sess.query(Picture).filter(Picture.artist == form.artist_name.data,
                                                 Picture.title == form.title.data).first()
-        return redirect(f'/view_picture/{picture.id}')
+        if picture:
+            return redirect(f'/view_picture/{picture.id}')
+        else:
+            return render_template('404.html')
     return render_template('search_picture.html', title='Искать картину', form=form)
 
 
@@ -121,10 +124,25 @@ def logout():
     return redirect("/")
 
 
-@app.route('/rate_picture')
+@app.route('/rate_picture', methods=['GET', 'POST'])
 def rate_picture():
-    # TODO: здесь будет реализована фича оценки картины
-    pass
+    form = RatePictureForm()
+    if form.validate_on_submit():
+        print(form)
+        print(form.title.data)
+        print(form.artist_name.data)
+        print(form.opinion.data)
+        db_sess = create_session()
+        picture = db_sess.query(Picture).filter(Picture.artist == form.artist_name.data,
+                                                Picture.title == form.title.data).first()
+        if picture:
+            if form.opinion.data == 'Нравится':
+                picture.rating += 1
+            else:
+                picture.rating -= 1
+            db_sess.commit()
+        return redirect('/')
+    return render_template('rate_picture.html', form=form, title='Оценить картину')
 
 
 @app.route('/delete_picture', methods=['GET', 'POST'])
