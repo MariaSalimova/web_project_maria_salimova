@@ -56,12 +56,12 @@ def registration():
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
-            return render_template('generic_form.html', title='Регистрация',
+            return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Пароли не совпадают")
         db_sess = create_session()
         if db_sess.query(Artist).filter(Artist.email == form.email.data).first():
-            return render_template('generic_form.html', title='Регистрация',
+            return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
         user = Artist(
@@ -73,19 +73,23 @@ def registration():
         db_sess.add(user)
         db_sess.commit()
         return redirect('/login')
-    return render_template('generic_form.html', title='Регистрация', form=form)
+    return render_template('register.html', title='Регистрация', form=form)
 
 
 @app.route('/add_picture', methods=['GET', 'POST'])
 @login_required
 def add_picture():
-    # TODO: здесь будет реализована фича добавления картины
     form = AddPictureForm()
     if form.validate_on_submit():
+        db_sess = create_session()
+        if db_sess.query(Picture).filter(Picture.title == form.title.data).first():
+            return render_template('add_picture.html', title='Опубликовать картину',
+                                   form=form,
+                                   message="Картина с таким названием уже есть")
+        print(form.image.data)
         form.image.data.save(dst='img_file')
         with open('img_file', 'rb') as f:
             image_binary = f.read()
-        db_sess = create_session()
 
         picture = Picture()
         picture.title = form.title.data
@@ -99,8 +103,9 @@ def add_picture():
 
 @app.route('/view_picture/<picture_id>')
 def view_picture(picture_id):
-    # TODO: здесь будет реализована фича просмотра картины
-    pass
+    db_sess = create_session()
+    picture = db_sess.query(Picture).filter(Picture.id == picture_id).first()
+    return render_template('view_picture.html', picture=picture)
 
 
 @app.route('/search_picture', methods=['GET', 'POST'])
@@ -108,8 +113,7 @@ def search_picture():
     form = SearchPictureForm()
     if form.validate_on_submit():
         db_sess = create_session()
-        picture = db_sess.query(Picture).filter(Picture.artist == form.artist_name.data,
-                                                Picture.title == form.title.data).first()
+        picture = db_sess.query(Picture).filter(Picture.title == form.title.data).first()
         if picture:
             return redirect(f'/view_picture/{picture.id}')
         else:
@@ -134,27 +138,22 @@ def search_artist():
 @app.route('/logout')
 @login_required
 def logout():
-    session.clear()
     logout_user()
     return redirect("/")
 
 
-@app.route('/rate_picture', methods=['GET', 'POST'])
-def rate_picture():
+@app.route('/rate_picture/<picture_id>', methods=['GET', 'POST'])
+def rate_picture(picture_id):
     form = RatePictureForm()
     if form.validate_on_submit():
-        print(form)
-        print(form.title.data)
-        print(form.artist_name.data)
-        print(form.opinion.data)
         db_sess = create_session()
-        picture = db_sess.query(Picture).filter(Picture.artist == form.artist_name.data,
-                                                Picture.title == form.title.data).first()
+        picture = db_sess.query(Picture).filter(Picture.id == picture_id).first()
         if picture:
             if form.opinion.data == 'Нравится':
                 picture.rating += 1
             else:
                 picture.rating -= 1
+
             db_sess.commit()
         return redirect('/')
     return render_template('rate_picture.html', form=form, title='Оценить картину')
@@ -166,8 +165,7 @@ def delete_picture():
     if form.validate_on_submit():
         if form.admin_password.data == ADMIN_PASSWORD:
             db_sess = create_session()
-            picture = db_sess.query(Picture).filter(Picture.artist == form.artist_name.data,
-                                                    Picture.title == form.title.data).first()
+            picture = db_sess.query(Picture).filter(Picture.title == form.title.data).first()
             db_sess.delete(picture)
             db_sess.commit()
         return redirect('/')
@@ -186,6 +184,13 @@ def delete_artist():
             db_sess.commit()
         return redirect('/')
     return render_template('delete_artist.html', title='Удалить художника', form=form)
+
+
+@app.route('/picture_from_hex/<picture_id>')
+def picture_from_hex(picture_id):
+    db_sess = create_session()
+    picture = db_sess.query(Picture).filter(Picture.id == picture_id).first()
+    return picture.picture
 
 
 @login_manager.user_loader

@@ -17,7 +17,7 @@ class Artist(SqlAlchemyBase, UserMixin, SerializerMixin):
     pictures = orm.relation('Picture', back_populates='artist')
 
     def __repr__(self):
-        return f'<Artist> {self.id} {self.artist_name} {self.email}'
+        return f'{self.id}:{self.artist_name}'
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
