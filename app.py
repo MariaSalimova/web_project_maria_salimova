@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect
+from flask import Flask, render_template, redirect, session
 from data import *
 from forms import *
 from secret_key import SECRET_KEY
@@ -76,11 +76,25 @@ def registration():
     return render_template('generic_form.html', title='Регистрация', form=form)
 
 
-@app.route('/add_picture')
+@app.route('/add_picture', methods=['GET', 'POST'])
 @login_required
 def add_picture():
     # TODO: здесь будет реализована фича добавления картины
-    pass
+    form = AddPictureForm()
+    if form.validate_on_submit():
+        form.image.data.save(dst='img_file')
+        with open('img_file', 'rb') as f:
+            image_binary = f.read()
+        db_sess = create_session()
+
+        picture = Picture()
+        picture.title = form.title.data
+        picture.picture = image_binary
+        current_user.pictures.append(picture)
+        db_sess.merge(current_user)
+        db_sess.commit()
+        return redirect('/')
+    return render_template('add_picture.html', form=form, title='Опубликовать картину')
 
 
 @app.route('/view_picture/<picture_id>')
@@ -120,6 +134,7 @@ def search_artist():
 @app.route('/logout')
 @login_required
 def logout():
+    session.clear()
     logout_user()
     return redirect("/")
 

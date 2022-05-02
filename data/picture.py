@@ -9,7 +9,7 @@ class Picture(SqlAlchemyBase, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     title = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    picture = sqlalchemy.Column(sqlalchemy.BINARY, nullable=True)
+    picture = sqlalchemy.Column(sqlalchemy.LargeBinary, nullable=True)
     artist_id = sqlalchemy.Column(sqlalchemy.Integer, sqlalchemy.ForeignKey("artists.id"))
     artist = orm.relation('Artist')
     rating = sqlalchemy.Column(sqlalchemy.Integer, default=0)
