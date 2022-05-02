@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, session
+from flask import Flask, render_template, redirect
 from data import *
 from forms import *
 from secret_key import SECRET_KEY
